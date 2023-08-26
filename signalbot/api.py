@@ -2,7 +2,7 @@ import aiohttp
 import base64
 import websockets
 
-from .attachment import DownloadAttachment
+from .attachment import ReceiveAttachment
 
 
 class SignalAPI:
@@ -43,17 +43,17 @@ class SignalAPI:
             "number": self.phone_number,
             "recipients": [receiver],
         }
-        # try:
-        async with aiohttp.ClientSession() as session:
-            resp = await session.post(uri, json=payload)
-            resp.raise_for_status()
-            return resp
-        # except (
-        #     aiohttp.ClientError,
-        #     aiohttp.http_exceptions.HttpProcessingError,
-        #     KeyError,
-        # ):
-        #     raise SendMessageError
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.post(uri, json=payload)
+                resp.raise_for_status()
+                return resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+            KeyError,
+        ):
+            raise SendMessageError
 
     async def react(
         self, recipient: str, reaction: str, target_author: str, timestamp: int
@@ -108,7 +108,7 @@ class SignalAPI:
         ):
             raise StopTypingError
         
-    async def fetch_attachment(self, attachment: DownloadAttachment):
+    async def fetch_attachment(self, attachment: ReceiveAttachment):
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.get(self._fetch_attachment_uri(attachment.id_))

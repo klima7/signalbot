@@ -1,7 +1,7 @@
 import json
 from enum import Enum
 
-from .attachment import DownloadAttachment
+from .attachment import ReceiveAttachment
 
 
 class MessageType(Enum):
@@ -150,7 +150,7 @@ class Message:
     def _parse_attachments(self, message: dict) -> str:
         try:
             attachments = message["attachments"]
-            attachments_obj = [DownloadAttachment.parse(attachment) for attachment in attachments]
+            attachments_obj = [ReceiveAttachment.parse(attachment) for attachment in attachments]
             return attachments_obj
         except Exception:
             return []

@@ -4,7 +4,7 @@ import mimetypes
 from pathlib import Path
 
 
-class UploadAttachment:
+class SendAttachment:
     
     def __init__(
         self,
@@ -17,7 +17,7 @@ class UploadAttachment:
         self.data = data
 
 
-class DownloadAttachment:
+class ReceiveAttachment:
     
     def __init__(
         self,
