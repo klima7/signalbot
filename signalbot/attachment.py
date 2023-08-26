@@ -1,50 +1,39 @@
+from abc import ABC
 import tempfile
 import mimetypes
+import base64
 from pathlib import Path
 
 
-class Attachment:
+class UploadAttachment:
     
     def __init__(
         self,
-        content_type: str = None,
-        filename: str = None,
-        data: bytes = None
+        data: bytes,
+        content_type: str | None = None,
+        filename: str | None = None,
     ):
         self.content_type = content_type
         self.filename = filename
         self.data = data
-        
-    def __repr__(self):
-        return f'{type(self).__name__}(content_type={self.content_type}, filename={self.filename})'
 
 
-class UploadAttachment(Attachment):
-    
-    def __init__(
-        content_type: str = None,
-        filename: str = None,
-        data: bytes = None
-    ):
-        super().__init__(content_type, filename, data)
-
-
-class DownloadAttachment(Attachment):
+class DownloadAttachment:
     
     def __init__(
         self,
-        content_type: str = None,
-        filename: str = None,
-        id_: str = None,
-        size: int = None,
-        width: int = None,
-        height: int = None,
-        caption: str = None,
-        upload_timestamp: int = None,
-        raw_attachment: dict = None
+        content_type: str,
+        filename: str,
+        id_: str,
+        size: int,
+        width: int,
+        height: int,
+        caption: str,
+        upload_timestamp: int,
+        raw_attachment: dict
     ):
-        super().__init__(content_type, filename)
-        
+        self.content_type = content_type
+        self.filename = filename
         self.id_ = id_
         self.size = size
         self.width = width
