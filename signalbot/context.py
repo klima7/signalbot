@@ -25,3 +25,6 @@ class Context:
 
     async def stop_typing(self):
         await self.bot.stop_typing(self.message.recipient())
+
+    async def fetch_attachment(self, attachment):
+        await self.bot.fetch_attachment(attachment)

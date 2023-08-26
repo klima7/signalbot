@@ -1,6 +1,8 @@
 import json
 from enum import Enum
 
+from .attachment import DownloadAttachment
+
 
 class MessageType(Enum):
     SYNC_MESSAGE = 1
@@ -14,7 +16,7 @@ class Message:
         timestamp: int,
         type: MessageType,
         text: str,
-        base64_attachments: list = None,
+        attachments: list = None,
         group: str = None,
         reaction: str = None,
         mentions: list = None,
@@ -27,9 +29,9 @@ class Message:
         self.text = text
 
         # optional
-        self.base64_attachments = base64_attachments
-        if self.base64_attachments is None:
-            self.base64_attachments = []
+        self.attachments = attachments
+        if self.attachments is None:
+            self.attachments = []
 
         self.group = group
 
@@ -76,6 +78,9 @@ class Message:
             mentions = cls._parse_mentions(
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
+            attachments = cls._parse_attachments(
+                raw_message["envelope"]["syncMessage"]["sentMessage"]
+            )
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:
@@ -84,19 +89,17 @@ class Message:
             group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
             reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
             mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
+            attachments = cls._parse_attachments(raw_message["envelope"]["dataMessage"])
 
         else:
             raise UnknownMessageFormatError
-
-        # TODO: base64_attachments
-        base64_attachments = []
 
         return cls(
             source,
             timestamp,
             type,
             text,
-            base64_attachments,
+            attachments,
             group,
             reaction,
             mentions,
@@ -142,6 +145,15 @@ class Message:
             return reaction
         except Exception:
             return None
+        
+    @classmethod
+    def _parse_attachments(self, message: dict) -> str:
+        try:
+            attachments = message["attachments"]
+            attachments_obj = [DownloadAttachment.parse(attachment) for attachment in attachments]
+            return attachments_obj
+        except Exception:
+            return []
 
     def __str__(self):
         if self.text is None:

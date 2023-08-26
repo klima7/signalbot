@@ -1,6 +1,8 @@
 import aiohttp
 import websockets
 
+from .attachment import DownloadAttachment
+
 
 class SignalAPI:
     def __init__(
@@ -100,6 +102,18 @@ class SignalAPI:
             aiohttp.http_exceptions.HttpProcessingError,
         ):
             raise StopTypingError
+        
+    async def fetch_attachment(self, attachment: DownloadAttachment):
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.get(self._fetch_attachment_uri(attachment.id_))
+                resp.raise_for_status()
+                attachment.data = await resp.read()
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise FetchAttachmentError
 
     def _receive_ws_uri(self):
         return f"ws://{self.signal_service}/v1/receive/{self.phone_number}"
@@ -112,6 +126,9 @@ class SignalAPI:
 
     def _typing_indicator_uri(self):
         return f"http://{self.signal_service}/v1/typing-indicator/{self.phone_number}"
+    
+    def _fetch_attachment_uri(self, attachment_id: str):
+        return f"http://{self.signal_service}/v1/attachments/{attachment_id}"
 
 
 class ReceiveMessagesError(Exception):
@@ -135,4 +152,8 @@ class StopTypingError(TypingError):
 
 
 class ReactionError(Exception):
+    pass
+
+
+class FetchAttachmentError(Exception):
     pass

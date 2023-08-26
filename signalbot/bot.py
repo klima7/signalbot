@@ -175,7 +175,7 @@ class SignalBot:
                     timestamp=timestamp,
                     type=MessageType.SYNC_MESSAGE,
                     text=text,
-                    base64_attachments=base64_attachments,
+                    attachments=base64_attachments,
                     group=None,
                 )
             else:
@@ -184,7 +184,7 @@ class SignalBot:
                     timestamp=timestamp,
                     type=MessageType.SYNC_MESSAGE,
                     text=text,
-                    base64_attachments=base64_attachments,
+                    attachments=base64_attachments,
                     group=receiver,
                 )
             await self._ask_commands_to_handle(sent_message)
@@ -206,6 +206,9 @@ class SignalBot:
     async def stop_typing(self, receiver: str):
         receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
+        
+    async def fetch_attachment(self, attachment_ids: str):
+        await self._signal.fetch_attachment(attachment_ids)
 
     def _resolve_receiver(self, receiver: str) -> str:
         if self._is_phone_number(receiver):
