@@ -16,7 +16,7 @@ class Message:
         timestamp: int,
         type: MessageType,
         text: str,
-        attachments: list = None,
+        base64_attachments: list = None,
         group: str = None,
         reaction: str = None,
         mentions: list = None,
@@ -29,9 +29,9 @@ class Message:
         self.text = text
 
         # optional
-        self.attachments = attachments
-        if self.attachments is None:
-            self.attachments = []
+        self.base64_attachments = base64_attachments
+        if self.base64_attachments is None:
+            self.base64_attachments = []
 
         self.group = group
 
@@ -78,7 +78,7 @@ class Message:
             mentions = cls._parse_mentions(
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
-            attachments = cls._parse_attachments(
+            base64_attachments = cls._parse_attachments(
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
 
@@ -89,7 +89,7 @@ class Message:
             group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
             reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
             mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
-            attachments = cls._parse_attachments(raw_message["envelope"]["dataMessage"])
+            base64_attachments = cls._parse_attachments(raw_message["envelope"]["dataMessage"])
 
         else:
             raise UnknownMessageFormatError
@@ -99,7 +99,7 @@ class Message:
             timestamp,
             type,
             text,
-            attachments,
+            base64_attachments,
             group,
             reaction,
             mentions,

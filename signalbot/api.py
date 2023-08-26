@@ -28,12 +28,12 @@ class SignalAPI:
             raise ReceiveMessagesError(e)
 
     async def send(
-        self, receiver: str, message: str, attachments: list = None
+        self, receiver: str, message: str, base64_attachments: list = None
     ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()
-        if attachments is None:
-            attachments = []
-        base64_attachments = [self._cvt_attachment_to_base64(attachment) for attachment in attachments]
+        if base64_attachments is None:
+            base64_attachments = []
+        base64_attachments = [self._cvt_attachment_to_base64(attachment) for attachment in base64_attachments]
         payload = {
             "base64_attachments": base64_attachments,
             "message": message,
@@ -134,6 +134,11 @@ class SignalAPI:
     
     @staticmethod
     def _cvt_attachment_to_base64(attachment):
+        # attachment is already base64 string
+        if isinstance(attachment, str):
+            return attachment
+        
+        # attachment is SendAttachment object
         result = ''
         if attachment.content_type:
             result += f'data:{attachment.content_type};'

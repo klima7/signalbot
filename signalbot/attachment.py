@@ -77,4 +77,4 @@ class ReceiveAttachment:
 
     def _assert_data(self):
         assert self.data is not None, \
-        "Attachment data is not fetched yet, call Context.fetch_attachment(attachment) first"
+        "Attachment data is not fetched yet, call Context.fetch_attachment_data(attachment) first"
