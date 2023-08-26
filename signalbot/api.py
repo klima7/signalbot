@@ -34,9 +34,6 @@ class SignalAPI:
         if attachments is None:
             attachments = []
         base64_attachments = [self._cvt_attachment_to_base64(attachment) for attachment in attachments]
-        if base64_attachments:
-            print(base64_attachments[0][:500], flush=True)
-            print('*'*200, flush=True)
         payload = {
             "base64_attachments": base64_attachments,
             "message": message,
@@ -108,7 +105,7 @@ class SignalAPI:
         ):
             raise StopTypingError
         
-    async def fetch_attachment(self, attachment: ReceiveAttachment):
+    async def fetch_attachment_data(self, attachment: ReceiveAttachment):
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.get(self._fetch_attachment_uri(attachment.id_))

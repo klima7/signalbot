@@ -207,8 +207,8 @@ class SignalBot:
         receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
         
-    async def fetch_attachment(self, attachment_ids: str):
-        await self._signal.fetch_attachment(attachment_ids)
+    async def fetch_attachment_data(self, attachment_ids: str):
+        await self._signal.fetch_attachment_data(attachment_ids)
 
     def _resolve_receiver(self, receiver: str) -> str:
         if self._is_phone_number(receiver):
