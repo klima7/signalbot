@@ -1,4 +1,5 @@
 import aiohttp
+import base64
 import websockets
 
 from .attachment import DownloadAttachment
@@ -27,28 +28,32 @@ class SignalAPI:
             raise ReceiveMessagesError(e)
 
     async def send(
-        self, receiver: str, message: str, base64_attachments: list = None
+        self, receiver: str, message: str, attachments: list = None
     ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()
-        if base64_attachments is None:
-            base64_attachments = []
+        if attachments is None:
+            attachments = []
+        base64_attachments = [self._cvt_attachment_to_base64(attachment) for attachment in attachments]
+        if base64_attachments:
+            print(base64_attachments[0][:500], flush=True)
+            print('*'*200, flush=True)
         payload = {
             "base64_attachments": base64_attachments,
             "message": message,
             "number": self.phone_number,
             "recipients": [receiver],
         }
-        try:
-            async with aiohttp.ClientSession() as session:
-                resp = await session.post(uri, json=payload)
-                resp.raise_for_status()
-                return resp
-        except (
-            aiohttp.ClientError,
-            aiohttp.http_exceptions.HttpProcessingError,
-            KeyError,
-        ):
-            raise SendMessageError
+        # try:
+        async with aiohttp.ClientSession() as session:
+            resp = await session.post(uri, json=payload)
+            resp.raise_for_status()
+            return resp
+        # except (
+        #     aiohttp.ClientError,
+        #     aiohttp.http_exceptions.HttpProcessingError,
+        #     KeyError,
+        # ):
+        #     raise SendMessageError
 
     async def react(
         self, recipient: str, reaction: str, target_author: str, timestamp: int
@@ -129,6 +134,18 @@ class SignalAPI:
     
     def _fetch_attachment_uri(self, attachment_id: str):
         return f"http://{self.signal_service}/v1/attachments/{attachment_id}"
+    
+    @staticmethod
+    def _cvt_attachment_to_base64(attachment):
+        result = ''
+        if attachment.content_type:
+            result += f'data:{attachment.content_type};'
+        if attachment.filename:
+            result += f'filename={attachment.filename};'
+        if attachment.content_type or attachment.filename:
+            result += 'base64,'
+        result += base64.b64encode(attachment.data).decode('utf-8')
+        return result
 
 
 class ReceiveMessagesError(Exception):

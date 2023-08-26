@@ -1,7 +1,6 @@
 from abc import ABC
 import tempfile
 import mimetypes
-import base64
 from pathlib import Path
 
 

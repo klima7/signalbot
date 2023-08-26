@@ -8,12 +8,12 @@ class Context:
         self.message = message
 
     async def send(
-        self, text: str, base64_attachments: list = None, listen: bool = False
+        self, text: str, attachments: list = None, listen: bool = False
     ):
         await self.bot.send(
             self.message.recipient(),
             text,
-            base64_attachments=base64_attachments,
+            attachments=attachments,
             listen=listen,
         )
 
